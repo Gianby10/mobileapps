@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">MobileApps</string>
     <string name="app_name">CreateAccount</string>
     <string name="welcome">Welcome back</string>
     <string name="sign_in_text">sign in to access your account</string>
