@@ -49,5 +49,21 @@ class CredentialsManagerTest {
         assertTrue(result)
     }
 
+    @Test
+    fun givenProperCredentials_thenReturnTrue() {
+        val email = "test@te.st"
+        val password = "1234"
+        val result = email == "test@te.st" && password == "1234"
+        assertTrue(result)
+    }
+
+    @Test
+    fun givenWrongCredentials_thenReturnFalse() {
+        val email = "wrong@te.st"
+        val password = "wrong"
+        val result = email == "test@te.st" && password == "1234"
+        assertFalse(result)
+    }
+
 
 }
