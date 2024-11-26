@@ -11,7 +11,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 class LoginActivity : AppCompatActivity() {
-    val credentialsManager = CredentialsManager()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
         val password = passwordEditText.text.toString()
 
         // Validate email
-        if (!credentialsManager.isEmailValid(email)) {
+        if (!CredentialsManager.isEmailValid(email)) {
             emailInputLayout.error = "Invalid email format"
             return
         } else {
@@ -53,15 +53,15 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // Validate password
-        if (!credentialsManager.isPasswordValid(password)) {
+        if (!CredentialsManager.isPasswordValid(password)) {
             passwordInputLayout.error = "Password cannot be empty"
             return
         } else {
             passwordInputLayout.error = null
         }
 
-        // Check hardcoded credentials
-        if (email == "test@te.st" && password == "1234") {
+
+        if (CredentialsManager.login(email, password)) {
             // go to MainActivity
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -71,4 +71,6 @@ class LoginActivity : AppCompatActivity() {
             passwordInputLayout.error = "Invalid credentials"
         }
     }
+
+
 }
