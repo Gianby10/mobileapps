@@ -17,4 +17,6 @@
     <string name="log_in">Log in</string>
     <string name="phone_number">Phone number</string>
     <string name="by_checking_the_box_you_agree_to_our_terms_and_conditions">By checking the box you agree to our Terms and Conditions.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
