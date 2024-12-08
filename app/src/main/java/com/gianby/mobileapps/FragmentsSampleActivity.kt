@@ -21,9 +21,9 @@ class FragmentsSampleActivity : AppCompatActivity(R.layout.activity_fragments_sa
             insets
         }
 
-        findViewById<Button>(R.id.navigateButton).setOnClickListener{
+        /*findViewById<Button>(R.id.navigateButton).setOnClickListener{
             toggleFragment()
-        }
+        }*/
     }
 
     private fun toggleFragment() {
