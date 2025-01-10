@@ -6,26 +6,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Recycler
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import kotlinx.coroutines.flow.collectLatest
+
 data class Recipe(val id: Int, val title: String, val description: String)
 class MainActivity : AppCompatActivity(), RecipesAdapter.EventsHandler {
+    private val viewModel: RecipesViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recipesList)
-        /*recyclerView.adapter = RecipesAdapter(
-            listOf("Lorem","Ipsum","Saas","Cazzo")
-        )
-
-        recyclerView.layoutManager = LinearLayoutManager(this)*/
+        val searchView = findViewById<SearchView>(R.id.recipeSearchView)
+        val adapter = RecipesAdapter(emptyList(), this)
 
         val recipes = listOf(
             Recipe(1, "Recipe 1", "Description 1."),
@@ -34,9 +38,28 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.EventsHandler {
             Recipe(4, "Recipe 4", "Description 4.")
         )
 
-        val adapter = RecipesAdapter(recipes,this)
+        //val adapter = RecipesAdapter(recipes,this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.recipes.collectLatest { recipes ->
+                if (adapter.itemCount != recipes.size) {
+                    adapter.updateRecipes(recipes)
+                }
+            }
+        }
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.searchRecipes(newText.orEmpty())
+                return true
+            }
+        })
     }
 
      override fun onRecipeClicked(itemId: Int) {
@@ -51,7 +74,7 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.EventsHandler {
 }
 
 class RecipesAdapter(
-    private val recipes: List<Recipe>,
+    private var recipes: List<Recipe>,
     private val eventsHandler: EventsHandler
 ) : RecyclerView.Adapter<RecipesAdapter.ViewHolder>() {
 
@@ -70,6 +93,11 @@ class RecipesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recipe, parent, false)
         return ViewHolder(view)
+    }
+
+    fun updateRecipes(newRecipes: List<Recipe>) {
+        this.recipes = newRecipes
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
