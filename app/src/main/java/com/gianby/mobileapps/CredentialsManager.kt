@@ -1,9 +1,14 @@
 package com.gianby.mobileapps
 
 import android.util.Log
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 
-object CredentialsManager {
+class CredentialsManager {
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
     private val emailPattern = ("[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
             "\\@" +
             "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
@@ -26,6 +31,7 @@ object CredentialsManager {
     fun login(email: String, password: String): Boolean {
         if(credentials.contains(email)){
             if(credentials[email] == password){
+                _isLoggedIn.value = true
                 return true
             }
         }
@@ -41,5 +47,9 @@ object CredentialsManager {
         }
 
         return true
+    }
+
+    fun logout() {
+        _isLoggedIn.value = false
     }
 }
