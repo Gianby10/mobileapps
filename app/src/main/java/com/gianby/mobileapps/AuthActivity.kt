@@ -16,8 +16,6 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
             insets
         }
 
-        /*findViewById<Button>(R.id.navigateButton).setOnClickListener{
-            toggleFragment()
-        }*/
+
     }
 }
