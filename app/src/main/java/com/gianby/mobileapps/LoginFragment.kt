@@ -12,7 +12,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
-
+    private val credentialsManager: CredentialsManager
+        get() = MobileApplication.getInstance().credentialsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +49,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val password = passwordEditText.text.toString()
 
         // Validate email
-        if (!CredentialsManager.isEmailValid(email)) {
+        if (!credentialsManager.isEmailValid(email)) {
             emailInputLayout.error = "Invalid email format"
             return
         } else {
@@ -56,7 +57,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         // Validate password
-        if (!CredentialsManager.isPasswordValid(password)) {
+        if (!credentialsManager.isPasswordValid(password)) {
             passwordInputLayout.error = "Password cannot be empty"
             return
         } else {
@@ -64,7 +65,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
 
-        if (CredentialsManager.login(email, password)) {
+        if (credentialsManager.login(email, password)) {
             // go to MainActivity
             val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)

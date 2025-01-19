@@ -14,7 +14,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 class RegisterFragment : Fragment(R.layout.fragment_register) {
-
+    private val credentialsManager: CredentialsManager
+        get() = MobileApplication.getInstance().credentialsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +59,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             return
         }
 
-        if (!CredentialsManager.isEmailValid(email)) {
+        if (!credentialsManager.isEmailValid(email)) {
             emailInputLayout.error = "Invalid email format"
             return
         } else {
@@ -66,14 +67,14 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         }
 
         // Validate password
-        if (!CredentialsManager.isPasswordValid(password)) {
+        if (!credentialsManager.isPasswordValid(password)) {
             passwordInputLayout.error = "Password cannot be empty"
             return
         } else {
             passwordInputLayout.error = null
         }
 
-        if(CredentialsManager.register(fullname,email,phone,password)){
+        if(credentialsManager.register(fullname,email,phone,password)){
             //Toast.makeText(this, "User registered correctly, please login!", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
         }else{
