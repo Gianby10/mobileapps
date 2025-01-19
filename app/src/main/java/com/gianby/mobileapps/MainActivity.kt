@@ -1,5 +1,6 @@
 package com.gianby.mobileapps
 
+import RecipesAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,15 +13,18 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Recycler
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.example.myapplication.RecipesList
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 data class Recipe(val id: Int, val title: String, val description: String)
 class MainActivity : AppCompatActivity(), RecipesAdapter.EventsHandler {
-    private val viewModel: RecipesViewModel by viewModels()
+    private val recipeViewModel: RecipesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,19 +35,12 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.EventsHandler {
         val searchView = findViewById<SearchView>(R.id.recipeSearchView)
         val adapter = RecipesAdapter(emptyList(), this)
 
-        val recipes = listOf(
-            Recipe(1, "Recipe 1", "Description 1."),
-            Recipe(2, "Recipe 2", "Description 2."),
-            Recipe(3, "Recipe 3", "Description 3."),
-            Recipe(4, "Recipe 4", "Description 4.")
-        )
 
-        //val adapter = RecipesAdapter(recipes,this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.recipes.collectLatest { recipes ->
+        lifecycleScope.launch {
+            recipeViewModel.recipes.collectLatest { recipes ->
                 if (adapter.itemCount != recipes.size) {
                     adapter.updateRecipes(recipes)
                 }
@@ -56,7 +53,7 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.EventsHandler {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.searchRecipes(newText.orEmpty())
+                recipeViewModel.searchRecipes(newText.orEmpty())
                 return true
             }
         })
@@ -73,56 +70,4 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.EventsHandler {
     }
 }
 
-class RecipesAdapter(
-    private var recipes: List<Recipe>,
-    private val eventsHandler: EventsHandler
-) : RecyclerView.Adapter<RecipesAdapter.ViewHolder>() {
 
-    interface EventsHandler {
-        fun onRecipeClicked(itemId: Int)
-        fun onActionButtonClicked(itemId: Int, action: String)
-    }
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val title: TextView = view.findViewById(R.id.title)
-        val description: TextView = view.findViewById(R.id.description)
-        val shareButton: ImageButton = view.findViewById(R.id.shareButton)
-        val likeButton: ImageButton = view.findViewById(R.id.likeButton)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recipe, parent, false)
-        return ViewHolder(view)
-    }
-
-    fun updateRecipes(newRecipes: List<Recipe>) {
-        this.recipes = newRecipes
-        notifyDataSetChanged()
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val recipe = recipes[position]
-        holder.title.text = recipe.title
-        holder.description.text = recipe.description
-
-
-        holder.itemView.setOnClickListener {
-            val context = holder.itemView.context
-            val intent = Intent(context, RecipeDetailsActivity::class.java)
-            intent.putExtra("RECIPE_TITLE", recipe.title)
-            intent.putExtra("RECIPE_DESCRIPTION", recipe.description)
-            intent.putExtra("RECIPE_IMAGE", R.drawable.ic_launcher_background) // Cambia con l'immagine effettiva
-            context.startActivity(intent)
-        }
-
-        // Handle clicks on specific buttons
-        holder.shareButton.setOnClickListener {
-            eventsHandler.onActionButtonClicked(recipe.id, "share")
-        }
-        holder.likeButton.setOnClickListener {
-            eventsHandler.onActionButtonClicked(recipe.id, "like")
-        }
-    }
-
-    override fun getItemCount(): Int = recipes.size
-}

@@ -34,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(goToRegisterIntent)
             finish()
         }
-    }
+    }   
 
     private fun handleLogin() {
         val emailInputLayout = findViewById<TextInputLayout>(R.id.emailInputLayout)
